@@ -1,0 +1,41 @@
+{
+    "os": "Windows-10-10.0.22621-SP0",
+    "python": "3.10.9",
+    "heartbeatAt": "2023-06-04T17:36:22.821716",
+    "startedAt": "2023-06-04T17:36:21.963737",
+    "docker": null,
+    "cuda": null,
+    "args": null,
+    "state": "running",
+    "program": "OneDrive/Documents/GitHub/WildfireResearch23/notebooks/ToySegmentation.ipynb",
+    "root": "C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23",
+    "git": {
+        "remote": "https://github.com/Galagalagalaga/WildfireResearch23.git",
+        "commit": "eb6ff75eae7de61e1047754c5427cf3cdeea94bf"
+    },
+    "email": "49544318+Galagalagalaga@users.noreply.github.com",
+    "host": "LAPTOP-F9SPBV7K",
+    "username": "arthu",
+    "executable": "C:\\Users\\arthu\\anaconda3\\python.exe",
+    "cpu_count": 14,
+    "cpu_count_logical": 20,
+    "cpu_freq": {
+        "current": 2300.0,
+        "min": 0.0,
+        "max": 2300.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2300.0,
+            "min": 0.0,
+            "max": 2300.0
+        }
+    ],
+    "disk": {
+        "total": 951.6455039978027,
+        "used": 269.51578521728516
+    },
+    "memory": {
+        "total": 31.73192596435547
+    }
+}
