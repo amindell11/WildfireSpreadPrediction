@@ -2,7 +2,7 @@
 import wandb
 wandb.login()
 
-# %%
+# %%z
 import math
 import random
 import torch, torchvision
@@ -11,6 +11,7 @@ import torchvision.transforms as T
 from torchvision.models import resnet50
 torch.set_grad_enabled(False);
 
+#import intel_extension_for_pytorch
 import logging
 import sys
 from pathlib import Path
@@ -21,6 +22,10 @@ from torch import optim
 from tqdm import tqdm
 os.environ['WANDB_NOTEBOOK_NAME'] = 'ToySegmentation.ipynb'
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
+torch.cuda.is_available()
+#torch.cuda.device_count()
+
+
 
 # %%
 def get_dataloader(is_train, batch_size, slice=5):
