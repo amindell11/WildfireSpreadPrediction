@@ -159,8 +159,8 @@ for _ in range(1):
     wandb.init(
         project="ToySegment",
         config={
-            "epochs": 100,
-            "batch_size": 200,
+            "epochs": 10,
+            "batch_size": 32,
             "lr": 1e-6
             })
     
