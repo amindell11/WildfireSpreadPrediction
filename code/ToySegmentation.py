@@ -21,9 +21,8 @@ import time
 from torch import optim
 from tqdm import tqdm
 os.environ['WANDB_NOTEBOOK_NAME'] = 'ToySegmentation.ipynb'
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-torch.cuda.is_available()
-#torch.cuda.device_count()
+device = torch.device("cuda") 
+
 
 
 
@@ -171,8 +170,7 @@ for _ in range(1):
     
     # A simple MLP model
     model = demodetr(num_classes=10)
-    if torch.cuda.is_available():
-        model.cuda()
+    model.to(device)
     # Make the loss and optimizer
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
