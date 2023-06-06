@@ -151,7 +151,7 @@ def log_image_table(images, predicted, labels, probs):
 
 # %%
 # Launch 5 experiments, trying different dropout rates
-for _ in range(5):
+for _ in range(1):
     # 🐝 initialise a wandb run
     wandb.init(
         project="ToySegment",
@@ -217,6 +217,3 @@ for _ in range(5):
 
     # 🐝 Close your wandb run 
     wandb.finish()
-
-
-
