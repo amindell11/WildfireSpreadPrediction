@@ -102,15 +102,11 @@ class demodetr(nn.Module):
                              tgtin).transpose(0, 1)
         
         ph = self.linear_class(h)
-        print(ph)
-        print(ph.shape)
-        l = ph.softmax(2)
-        print(l)
-        print(l.shape)
-        keep = l.max(-1)[0]
-        print(keep)
-        print(keep.shape)
-        #keep = keep.float()
+
+        #l = ph.softmax(2)
+
+        keep = ph.max(-1)[0]
+
         # finally project transformer outputs to class labels and bounding boxes
         return {'pred_logits': ph, 
                 'pred_label_strengths': keep,
@@ -150,14 +146,14 @@ def log_image_table(images, predicted, labels, probs):
 
 # %%
 # Launch 5 experiments, trying different dropout rates
-for _ in range(1):
+for _ in range(5):
     # 🐝 initialise a wandb run
     wandb.init(
         project="ToySegment",
         config={
             "epochs": 100,
-            "batch_size": 32,
-            "lr": 1e-3
+            "batch_size": 200,
+            "lr": 1e-6
             })
     
     # Copy your config 
@@ -182,7 +178,7 @@ for _ in range(1):
         for step, (images, labels) in enumerate(train_dl):
             images, labels = images.to(device), labels.to(device)
             #labels = labels.float()
-            print(labels.shape)
+            
             
             outputs = model(images)
             
@@ -217,7 +213,5 @@ for _ in range(1):
     # 🐝 Close your wandb run 
     wandb.finish()
 
-# %%
-wandb.finish()
 
 
