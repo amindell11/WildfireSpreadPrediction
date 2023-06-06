@@ -23,7 +23,11 @@ from tqdm import tqdm
 os.environ['WANDB_NOTEBOOK_NAME'] = 'ToySegmentation.ipynb'
 device = torch.device("cuda") 
 
+import gc
 
+gc.collect()
+
+torch.cuda.empty_cache()
 
 
 # %%
