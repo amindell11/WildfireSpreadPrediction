@@ -1,15 +1,15 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+# %%
 import wandb
 wandb.login()
 
-
-
+# %%
 import math
 import random
-import torch
+import torch, torchvision
 import torch.nn as nn
+import torchvision.transforms as T
+from torchvision.models import resnet50
+torch.set_grad_enabled(False);
 
 import logging
 import sys
@@ -19,33 +19,104 @@ import time
 
 from torch import optim
 from tqdm import tqdm
-from utils.data_loading import BasicDataset
-
+os.environ['WANDB_NOTEBOOK_NAME'] = 'ToySegmentation.ipynb'
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
-
+# %%
 def get_dataloader(is_train, batch_size, slice=5):
-    "Get a training dataloader"
-    train_dataset = torchvision.datasets.MNIST(root=".", train=is_train, transform=T.ToTensor(), download=True)
-    loader = torch.utils.data.DataLoader(dataset=sub_dataset, 
-                                         batch_size=batch_size, 
-                                         shuffle=True if is_train else False, 
-                                         pin_memory=True, num_workers=2)
+    transform = T.Compose([
+    T.Resize(800),
+    T.ToTensor(),
+    T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
+
+    trainset = torchvision.datasets.CIFAR10(root='./data', train=is_train, download=True, transform=transform)
+    sub_dataset = torch.utils.data.Subset(trainset, indices=range(0, len(trainset), slice))
+    loader = torch.utils.data.DataLoader(sub_dataset, batch_size=batch_size, shuffle=True if is_train else False, pin_memory=True, num_workers=2)
+    
     return loader
 
+# %%
+classes = ('plane', 'car', 'bird', 'cat',
+           'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
 
-def get_model(dropout):
-    "A simple model"
-    model = nn.Sequential(nn.Flatten(),
-                         nn.Linear(28*28, 256),
-                         nn.BatchNorm1d(256),
-                         nn.ReLU(),
-                         nn.Dropout(dropout),
-                         nn.Linear(256,10)).to(device)
-    return model
+# %%
+class demodetr(nn.Module):
+    def __init__(self, num_classes, hidden_dim=256, nheads=8,
+                 num_encoder_layers=6, num_decoder_layers=6):
+        super().__init__()
 
+        # create ResNet-50 backbone
+        self.backbone = resnet50()
+        del self.backbone.fc
 
+        # create conversion layer
+        self.conv = nn.Conv2d(2048, hidden_dim, 1)
 
+        # create a default PyTorch transformer
+        self.transformer = nn.Transformer(
+            hidden_dim, nheads, num_encoder_layers, num_decoder_layers)
+
+        # prediction heads, one extra class for predicting non-empty slots
+        # note that in baseline DETR linear_bbox layer is 3-layer MLP
+        self.linear_class = nn.Linear(hidden_dim, num_classes + 1)
+        self.linear_bbox = nn.Linear(hidden_dim, 4)
+
+        # output positional encodings (object queries)
+        self.query_pos = nn.Parameter(torch.rand(10, hidden_dim))
+
+        # spatial positional encodings
+        # note that in baseline DETR we use sine positional encodings
+        self.row_embed = nn.Parameter(torch.rand(50, hidden_dim // 2))
+        self.col_embed = nn.Parameter(torch.rand(50, hidden_dim // 2))
+
+    def forward(self, inputs):
+        # propagate inputs through ResNet-50 up to avg-pool layer
+        x = self.backbone.conv1(inputs)
+        x = self.backbone.bn1(x)
+        x = self.backbone.relu(x)
+        x = self.backbone.maxpool(x)
+
+        x = self.backbone.layer1(x)
+        x = self.backbone.layer2(x)
+        x = self.backbone.layer3(x)
+        x = self.backbone.layer4(x)
+
+        # convert from 2048 to 256 feature planes for the transformer
+        h = self.conv(x)
+
+        # construct positional encodings
+        H, W = h.shape[-2:]
+        pos = torch.cat([
+            self.col_embed[:W].unsqueeze(0).repeat(H, 1, 1),
+            self.row_embed[:H].unsqueeze(1).repeat(1, W, 1),
+        ], dim=-1).flatten(0, 1).unsqueeze(1)
+    
+        # propagate through the transformer
+        srcin = pos + 0.1 * h.flatten(2).permute(2, 0, 1)
+        batch_size_internal = srcin.shape[1]
+        tgtin = self.query_pos.unsqueeze(1).repeat(1, batch_size_internal, 1)
+        
+
+        h = self.transformer(srcin,
+                             tgtin).transpose(0, 1)
+        
+        ph = self.linear_class(h)
+        print(ph)
+        print(ph.shape)
+        l = ph.softmax(2)
+        print(l)
+        print(l.shape)
+        keep = l.max(-1)[0]
+        print(keep)
+        print(keep.shape)
+        #keep = keep.float()
+        # finally project transformer outputs to class labels and bounding boxes
+        return {'pred_logits': ph, 
+                'pred_label_strengths': keep,
+                'pred_boxes': self.linear_bbox(h).sigmoid()}
+
+# %%
 def validate_model(model, valid_dl, loss_func, log_images=False, batch_idx=0):
     "Compute performance of the model on the validation dataset and log a wandb.Table"
     model.eval()
@@ -68,28 +139,25 @@ def validate_model(model, valid_dl, loss_func, log_images=False, batch_idx=0):
                 log_image_table(images, predicted, labels, outputs.softmax(dim=1))
     return val_loss / len(valid_dl.dataset), correct / len(valid_dl.dataset)
 
-
-
+# %%
 def log_image_table(images, predicted, labels, probs):
     "Log a wandb.Table with (img, pred, target, scores)"
     # 🐝 Create a wandb Table to log images, labels and predictions to
-    table = wandb.Table(columns=["image", "pred", "target"]+[f"score_{i}" for i in range(10)])
+    table = wandb.Table(columns=["image", "pred", "target"]+[' '.join(f'{classes[labels[j]]:5s}' for j in range(batch_size))])
     for img, pred, targ, prob in zip(images.to("cpu"), predicted.to("cpu"), labels.to("cpu"), probs.to("cpu")):
         table.add_data(wandb.Image(img[0].numpy()*255), pred, targ, *prob.numpy())
     wandb.log({"predictions_table":table}, commit=False)
 
-
-
+# %%
 # Launch 5 experiments, trying different dropout rates
-for _ in range(5):
+for _ in range(1):
     # 🐝 initialise a wandb run
     wandb.init(
-        project="pytorch-intro",
+        project="ToySegment",
         config={
-            "epochs": 10,
-            "batch_size": 128,
-            "lr": 1e-3,
-            "dropout": random.uniform(0.01, 0.80),
+            "epochs": 100,
+            "batch_size": 32,
+            "lr": 1e-3
             })
     
     # Copy your config 
@@ -101,8 +169,7 @@ for _ in range(5):
     n_steps_per_epoch = math.ceil(len(train_dl.dataset) / config.batch_size)
     
     # A simple MLP model
-    model = get_model(config.dropout)
-
+    model = demodetr(num_classes=10)
     # Make the loss and optimizer
     loss_func = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
@@ -114,9 +181,13 @@ for _ in range(5):
         model.train()
         for step, (images, labels) in enumerate(train_dl):
             images, labels = images.to(device), labels.to(device)
-
+            #labels = labels.float()
+            print(labels.shape)
+            
             outputs = model(images)
-            train_loss = loss_func(outputs, labels)
+            
+            train_loss = loss_func(outputs["pred_label_strengths"], labels)
+            train_loss.requires_grad_()
             optimizer.zero_grad()
             train_loss.backward()
             optimizer.step()
@@ -142,8 +213,11 @@ for _ in range(5):
         print(f"Train Loss: {train_loss:.3f}, Valid Loss: {val_loss:3f}, Accuracy: {accuracy:.2f}")
 
     # If you had a test set, this is how you could log it as a Summary metric
-    wandb.summary['test_accuracy'] = 0.8
 
     # 🐝 Close your wandb run 
     wandb.finish()
+
+# %%
+wandb.finish()
+
 
