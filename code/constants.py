@@ -2,9 +2,9 @@ file_pattern = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/data
 file_pattern_test = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/datasets/NextDayWildfireSpread/next_day_wildfire_spread_test*'
 file_pattern_evaluate = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/datasets/NextDayWildfireSpread/next_day_wildfire_spread_eval*'
 
-cloud_file_pattern = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/datasets/NextDayWildfireSpread/next_day_wildfire_spread_train*'
-cloud_file_pattern_test = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/datasets/NextDayWildfireSpread/next_day_wildfire_spread_test*'
-cloud_file_pattern_evaluate = 'C:/Users/arthu/OneDrive/Documents/GitHub/WildfireResearch23/datasets/NextDayWildfireSpread/next_day_wildfire_spread_eval*'
+cloud_file_pattern = '/home/ubuntu/next_day_wildfire_spread_train*'
+cloud_file_pattern_test = '/home/ubuntu/next_day_wildfire_spread_test*'
+cloud_file_pattern_evaluate = '/home/ubuntu/next_day_wildfire_spread_eval*'
 
 
 

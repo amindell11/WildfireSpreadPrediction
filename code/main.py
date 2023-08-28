@@ -23,7 +23,7 @@ for epoch in parameters.epochs_try:
                 batchsize = batchs
                              
                 experiment = wandb.init(
-                project="WildfireTESTING",
+                project="WildfirePropagation23-24",
                 config={
                     "learning_rate": learningrate,
                     "architecture": "Convolutional Autoencoder",
@@ -49,7 +49,7 @@ for epoch in parameters.epochs_try:
                 
 
                 dataset = utils.get_dataset(
-                    constants.file_pattern,
+                    constants.cloud_file_pattern,
                     data_size=64,
                     sample_size=side_length,
                     batch_size=config.batch_size,
@@ -62,7 +62,7 @@ for epoch in parameters.epochs_try:
 
                 
                 dataset_test = utils.get_dataset(
-                    constants.file_pattern_test,
+                    constants.cloud_file_pattern_test,
                     data_size=64,
                     sample_size=side_length,
                     batch_size = config.batch_size,
@@ -75,7 +75,7 @@ for epoch in parameters.epochs_try:
                 )
 
                 dataset_evaluate = utils.get_dataset(
-                    constants.file_pattern_evaluate,
+                    constants.cloud_file_pattern_evaluate,
                     data_size=64,
                     sample_size=side_length,
                     batch_size = 100,
@@ -154,7 +154,7 @@ for epoch in parameters.epochs_try:
                 opt = keras.optimizers.Adam(learning_rate = config.learning_rate)
                 
                 autoencoder = Model(input_img, enc_output)
-                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.AUC(curve = 'PR'), keras.metrics.BinaryAccuracy()])
+                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.AUC(curve = 'PR')])
                 
 
 
