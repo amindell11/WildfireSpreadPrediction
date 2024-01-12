@@ -159,7 +159,7 @@ for epoch in parameters.epochs_try:
         print(dataset_test.element_spec)
 
         #print(model.config)
-        opt = keras.optimizers.Adam(learning_rate = 0.0001)
+        opt = keras.optimizers.Adam(learning_rate = config.learning_rate)
 
         model.compile(optimizer=opt)
 
@@ -169,7 +169,7 @@ for epoch in parameters.epochs_try:
             dataset,
             validation_data=dataset_test,
             callbacks=callbacks,
-            epochs=2,
+            epochs=config.epochs,
         )
         results = model.evaluate(dataset_evaluate)
         
