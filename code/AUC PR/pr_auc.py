@@ -30,7 +30,7 @@ You should use this metric:
 _KWARGS_DESCRIPTION = """
 Args:
 - references (array-like of shape (n_samples,) or (n_samples, n_classes)): True binary labels or binary label indicators.
-- prediction_scores (array-like of shape (n_samples,) or (n_samples, n_classes)): Model predictions. Target scores, can either be probability estimates of the positive class, confidence values, or non-thresholded measure of decisions (as returned by decision_function on some classifiers).
+- predictions (array-like of shape (n_samples,) or (n_samples, n_classes)): Model predictions. Target scores, can either be probability estimates of the positive class, confidence values, or non-thresholded measure of decisions (as returned by decision_function on some classifiers).
 - average (`str`): Type of average, and is ignored in the binary use case. Defaults to 'macro'. Options are:
     - `'micro'`: Calculate metrics globally by considering each element of the label indicator matrix as a label.
     - `'macro'`: Calculate metrics for each label, and find their unweighted mean. This does not take label imbalance into account.
@@ -77,7 +77,7 @@ class PRAUC(evaluate.Metric):
             inputs_description=_KWARGS_DESCRIPTION,
             features=datasets.Features(
                 {
-                    "prediction_scores": datasets.Sequence(datasets.Value("float")),
+                    "predictions": datasets.Sequence(datasets.Value("float")),
                     "references": datasets.Value("int32"),
                 }
             ),
@@ -87,7 +87,7 @@ class PRAUC(evaluate.Metric):
     def _compute(
         self,
         references,
-        prediction_scores,
+        predictions,
         average="macro",
         sample_weight=None,
         pos_label=1,
@@ -95,7 +95,7 @@ class PRAUC(evaluate.Metric):
         return {
             "average_precision": average_precision_score(
                 references,
-                prediction_scores,
+                predictions,
                 average=average,
                 sample_weight=sample_weight,
                 pos_labels=pos_label,
