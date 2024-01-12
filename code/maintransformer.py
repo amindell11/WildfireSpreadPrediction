@@ -127,12 +127,11 @@ for epoch in parameters.epochs_try:
             # compute the prediction labels and compute the metric
             pred_labels = tf.argmax(logits_resized, axis=-1)
             
-            print(pred_labels.shape)
-            print(labels.shape)
+            
             metrics = metric.compute(
                 predictions=pred_labels,
                 references=labels,
-                num_labels=1,
+                num_labels=2,
                 ignore_index=-1
             )
             # add per category metrics as individual key-value pairs
@@ -144,7 +143,6 @@ for epoch in parameters.epochs_try:
             )
             metrics.update({f"iou": v for i, v in enumerate(per_category_iou)})
             return {"val_" + k: v for k, v in metrics.items()}
-
 
 
 

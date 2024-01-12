@@ -22,7 +22,7 @@ from transformers.keras_callbacks import KerasMetricCallback
 from sklearn.metrics import average_precision_score
 from pdb import set_trace
 
-metric = evaluate.load("mean_iou")
+metric = evaluate.load("arthurvqin/pr_auc")
 
 #metric=keras.metrics.AUC(curve = 'PR')
 
@@ -100,10 +100,14 @@ def compute_metrics(eval_pred):
     
     # compute the prediction labels and compute the metric
     pred_labels = probabilities[:,:,:,1]
+    
+    pred_labels = tf.reshape(pred_labels, shape=(-1,))
+    
+    labels = tf.reshape(labels, shape=(-1,))
     #pred_labels = tf.argmax(probabilities, axis=-1)
     metrics = metric.compute(
-        prediction_scores=pred_labels,
-        references=labels
+        prediction_scores= pred_labels,
+        references=labels,
     )
     # add per category metrics as individual key-value pairs
     per_category_auc = metrics.pop("pr_auc").tolist()
@@ -114,12 +118,10 @@ def compute_metrics(eval_pred):
 
 metric_callback = KerasMetricCallback(
     metric_fn=compute_metrics,
-    eval_dataset=dataset_test,
+    eval_dataset=dataset_evaluate,
     batch_size=128,
     label_cols=["labels"],
 )
-
-print(dataset_test.element_spec)
 
 
 #print(model.config)
@@ -131,5 +133,4 @@ callbacks = [metric_callback]
 
 model.fit(dataset_evaluate, epochs=2, validation_data=dataset_test, callbacks=callbacks, shuffle=True, verbose=True)
 
-model.evaluate(dataset_evaluate)  
 
