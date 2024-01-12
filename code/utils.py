@@ -177,6 +177,7 @@ def _get_features_dict(
     ]
     return dict(zip(features, columns))
 
+
 def _parse_fn(
     example_proto: tf.train.Example, data_size: int, sample_size: int,
     num_in_channels: int, clip_and_normalize: bool,
@@ -235,12 +236,17 @@ def _parse_fn(
         input_img, output_img = center_crop_input_and_output_images(
             input_img, output_img, sample_size)
     return input_img, output_img
-
+def reshape_dataset(example):
+            inputs = tf.transpose(example['inputs'], perm=[0, 3, 1, 2])
+            masks = tf.transpose(example['masks'], perm=[0, 3, 1, 2])
+            masks = tf.squeeze(masks, axis=[1])
+            return {'labels': masks, 'pixel_values': inputs}
+        
 
 def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
                 batch_size: int, num_in_channels: int, compression_type: Text,
                 clip_and_normalize: bool, clip_and_rescale: bool,
-                random_crop: bool, center_crop: bool) -> tf.data.Dataset:
+                random_crop: bool, center_crop: bool, transformer_shape: bool) -> tf.data.Dataset:
     """Gets the dataset from the file pattern.
 
     Args:
@@ -282,10 +288,16 @@ def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
 
     dataset = dataset.filter(filter_function)
         
-
-
+    dataset = dataset.map(
+            lambda x, y: {'inputs': x, 'masks': y}
+        )
+    
+        
     dataset = dataset.batch(batch_size)
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    if (transformer_shape):
+        dataset = dataset.map(reshape_dataset)
+        
     return dataset
 
 
