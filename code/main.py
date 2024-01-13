@@ -154,12 +154,11 @@ for epoch in parameters.epochs_try:
                 opt = keras.optimizers.Adam(learning_rate = config.learning_rate)
                 
                 autoencoder = Model(input_img, enc_output)
-                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.AUC(curve = 'PR')])
+                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.MeanIoU(num_classes=2)])
                 
 
-
                 
-                history = autoencoder.fit(dataset, epochs=config.epochs, validation_data=dataset_test, shuffle=True, callbacks=[WandbMetricsLogger(log_freq="batch"), WandbModelCheckpoint(filepath = "models", save_best_only=True)])
+                history = autoencoder.fit(dataset, epochs=config.epochs, validation_data=dataset_test, shuffle=True, callbacks=[WandbMetricsLogger(log_freq="epoch"), WandbModelCheckpoint(filepath = "models", save_best_only=True)])
                 
                 
                 results = autoencoder.evaluate(dataset_evaluate)    
@@ -167,7 +166,3 @@ for epoch in parameters.epochs_try:
                 
                 
                 experiment.finish()            
-
-
-
-
