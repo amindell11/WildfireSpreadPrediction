@@ -164,7 +164,7 @@ for epoch in parameters.epochs_try:
                 history = autoencoder.fit(dataset, epochs=config.epochs, validation_data=dataset_test, shuffle=True, callbacks=[WandbMetricsLogger(log_freq="batch"), WandbModelCheckpoint(filepath = "models", save_best_only=True)])
                 
                 
-                results = autoencoder.evaluate(dataset_evaluate)    
+                results = autoencoder.evaluate(dataset_evaluate)
                 
                 
                 
