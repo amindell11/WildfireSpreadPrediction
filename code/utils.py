@@ -297,7 +297,10 @@ def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     if (transformer_shape):
         dataset = dataset.map(reshape_dataset)
-        
+    else:
+        dataset=dataset.map(
+            lambda x, y: {'input_1': x, 'masks':y}
+        )
     return dataset
 
 
