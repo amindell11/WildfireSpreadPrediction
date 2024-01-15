@@ -58,7 +58,8 @@ for epoch in parameters.epochs_try:
                     clip_and_normalize=True,
                     clip_and_rescale=False,
                     random_crop=False,
-                    center_crop=False)
+                    center_crop=False,
+                    transformer_shape=False)
 
                 
                 dataset_test = utils.get_dataset(
@@ -71,7 +72,8 @@ for epoch in parameters.epochs_try:
                     clip_and_normalize = True,
                     clip_and_rescale=False,
                     random_crop=False,
-                    center_crop=False
+                    center_crop=False,
+                    transformer_shape=False
                 )
 
                 dataset_evaluate = utils.get_dataset(
@@ -84,7 +86,8 @@ for epoch in parameters.epochs_try:
                     clip_and_normalize = True,
                     clip_and_rescale=False,
                     random_crop=False,
-                    center_crop=False
+                    center_crop=False,
+                    transformer_shape=False
                 )                                
 
                 input_img = Input(shape=(64, 64, 12))
