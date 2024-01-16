@@ -237,7 +237,7 @@ def _parse_fn(
             input_img, output_img, sample_size)
     return input_img, output_img
 def reshape_dataset(example):
-            inputs = tf.transpose(example['input_1'], perm=[0, 3, 1, 2])
+            inputs = tf.transpose(example['inputs'], perm=[0, 3, 1, 2])
             masks = tf.transpose(example['masks'], perm=[0, 3, 1, 2])
             masks = tf.squeeze(masks, axis=[1])
             return {'labels': masks, 'pixel_values': inputs}
@@ -289,7 +289,7 @@ def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
     dataset = dataset.filter(filter_function)
         
     dataset = dataset.map(
-            lambda x, y: {'input_1': x, 'masks': y}
+            lambda x, y: {'inputs': x, 'masks': y}
         )
     
         
@@ -297,7 +297,10 @@ def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
     dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     if (transformer_shape):
         dataset = dataset.map(reshape_dataset)
-    
+    else:
+        dataset=dataset.map(
+            lambda x, y: {'input_1': x, 'masks':y}
+        )
     return dataset
 
 
