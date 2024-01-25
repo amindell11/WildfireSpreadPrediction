@@ -287,20 +287,19 @@ def get_dataset(file_pattern: Text, data_size: int, sample_size: int,
         return tf.math.logical_not(has_negative_one)
 
     dataset = dataset.filter(filter_function)
-        
-    dataset = dataset.map(
+
+    
+    
+    if (transformer_shape):
+        dataset = dataset.map(
             lambda x, y: {'inputs': x, 'masks': y}
         )
-    
-        
-    dataset = dataset.batch(batch_size)
-    dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    if (transformer_shape):
+        dataset = dataset.batch(batch_size)
+        dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         dataset = dataset.map(reshape_dataset)
     else:
-        dataset=dataset.map(
-            lambda x, y: {'input_1': x, 'masks':y}
-        )
+        dataset = dataset.batch(batch_size)
+        dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     return dataset
 
 
