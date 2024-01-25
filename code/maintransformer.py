@@ -56,10 +56,10 @@ for epoch in parameters.epochs_try:
                                 Learning Rate: {lr} \
                                 Epochs: {num_epochs} \
                                 Batch Size: 128 \
-                                Hidden Size: {config.hidden_size} \
-                                Depth: {config.depth} \
-                                Decoder Hidden Size: {config.decoder_hidden_size} \
-                                Number of Encoder Blocks: {config.num_encoder_blocks} \ ")    
+                                Hidden Size: {hiddensize} \
+                                Depth: {depths} \
+                                Decoder Hidden Size: {decoderhiddensize} \
+                                Number of Encoder Blocks: {numencoderblocks} \ ")    
                         
                         
 
