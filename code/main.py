@@ -157,7 +157,7 @@ for epoch in parameters.epochs_try:
                 opt = keras.optimizers.Adam(learning_rate = config.learning_rate)
                 
                 autoencoder = Model(input_img, enc_output)
-                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.MeanIoU(num_classes=2)])
+                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.BinaryIoU(target_class_ids=[0, 1], threshold=0.5)])
                 
 
                 
