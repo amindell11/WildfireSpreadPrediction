@@ -8,162 +8,127 @@ from keras import backend as K
 import wandb
 from wandb.keras import WandbMetricsLogger, WandbModelCheckpoint
 
+import evaluate
+import tensorflow as tf
+
 import constants
 import utils
 import parameters
+import deeplab
+
+from transformers import TFSegformerForSemanticSegmentation, SegformerConfig
+
+from transformers.keras_callbacks import KerasMetricCallback
+from sklearn.metrics import average_precision_score
+from pdb import set_trace
+
+metric = evaluate.load("arthurvqin/pr_auc")
+
+#metric=keras.metrics.AUC(curve = 'PR')
+
+config = SegformerConfig(
+    num_channels = 12,
+    image_size = 64
+    
+    )
+model = TFSegformerForSemanticSegmentation(
+    config
+)
 
 
-for epoch in parameters.epochs_try:
-    num_epochs = epoch
-    for lr in parameters.learning_rate_try:
-        learningrate = lr
-        for dr in parameters.dropout_rate_try:
-            dropoutrate = dr
-            for batchs in parameters.batchsize_try:
-                batchsize = batchs
-                             
-                experiment = wandb.init(
-                project="WildfirePropagationDebug",
-                config={
-                    "learning_rate": learningrate,
-                    "architecture": "Convolutional Autoencoder",
-                    "dataset": "NDWS",
-                    "optimizer": "adam",
-                    "epochs": num_epochs,
-                    "batch_size": batchsize,
-                    "dropout_rate": dropoutrate
-                    }
-                )
-                print(f"Starting Training: \
-                        Learning Rate: {lr} \
-                        Epochs: {num_epochs} \
-                        Batch Size: {batchsize} \
-                        Dropout: {dropoutrate} \ ")    
-                
-                
-            
-                
+model_checkpoint = "nvidia/mit-b0"  # pre-trained model from which to fine-tune
 
 
-                side_length = 64 #length of the side of the square you select (so, e.g. pick 64 if you don't want any random cropping)
-                
 
-                dataset = utils.get_dataset(
-                    constants.file_pattern,
-                    data_size=64,
-                    sample_size=side_length,
-                    batch_size=batchsize,
-                    num_in_channels=12,
-                    compression_type=None,
-                    clip_and_normalize=True,
-                    clip_and_rescale=False,
-                    random_crop=False,
-                    center_crop=False,
-                    transformer_shape=False)
+side_length = 64
 
-                
-                dataset_test = utils.get_dataset(
-                    constants.file_pattern_test,
-                    data_size=64,
-                    sample_size=side_length,
-                    batch_size = batchsize,
-                    num_in_channels=12,
-                    compression_type=None,
-                    clip_and_normalize = True,
-                    clip_and_rescale=False,
-                    random_crop=False,
-                    center_crop=False,
-                    transformer_shape=False
-                )
-
-                dataset_evaluate = utils.get_dataset(
-                    constants.file_pattern_evaluate,
-                    data_size=64,
-                    sample_size=side_length,
-                    batch_size = 100,
-                    num_in_channels=12,
-                    compression_type=None,
-                    clip_and_normalize = True,
-                    clip_and_rescale=False,
-                    random_crop=False,
-                    center_crop=False,
-                    transformer_shape=False
-                )                                
-
-                input_img = Input(shape=(64, 64, 12))
-
-                #First skip connection
-                skip_conv2D_1 = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
-                skip_dropout_1 = Dropout(dropoutrate)(skip_conv2D_1)
-                enc_conv1 = Conv2D(16, (3, 3), activation='relu', padding='same')(input_img)
-                enc_dropout1 = Dropout(dropoutrate)(enc_conv1)
-                enc_merge_1 = Add()([enc_dropout1, skip_dropout_1])
+dataset = utils.get_dataset(
+    constants.file_pattern,
+    data_size=64,
+    sample_size=side_length,
+    batch_size=128,
+    num_in_channels=12,
+    compression_type=None,
+    clip_and_normalize=True,
+    clip_and_rescale=False,
+    random_crop=False,
+    center_crop=False,
+    transformer_shape=True
+    )
 
 
-                #First ResBlock(Maxpool)
-                skip_resblock1_conv = Conv2D(32, (3, 3), strides = (2,2), activation = 'relu', padding = 'same')(enc_merge_1)
-                skip_resblock1_dropout = Dropout(dropoutrate)(skip_resblock1_conv)
-                resblock1_leaky1 = LeakyReLU()(enc_merge_1)
-                resblock1_dropout1 = Dropout(dropoutrate)(resblock1_leaky1)
-                resblock1_maxpool = MaxPooling2D((2, 2), padding='same')(resblock1_dropout1)
-                resblock1_leaky2 = LeakyReLU()(resblock1_maxpool)
-                resblock1_dropout2 = Dropout(dropoutrate)(resblock1_leaky2)
-                resblock1_conv = Conv2D(32, (3 ,3), activation = 'relu', padding = 'same') (resblock1_dropout2)
-                resblock1_dropout3 = Dropout(dropoutrate)(resblock1_conv)
-                resblock1_merge = Add()([resblock1_dropout3, skip_resblock1_dropout])
+dataset_test = utils.get_dataset(
+    constants.file_pattern_test,
+    data_size=64,
+    sample_size=side_length,
+    batch_size = 128,
+    num_in_channels=12,
+    compression_type=None,
+    clip_and_normalize = True,
+    clip_and_rescale=False,
+    random_crop=False,
+    center_crop=False,
+    transformer_shape=True
+)
 
-                #Second ResBlock(Maxpool)
-                skip_resblock2_conv = Conv2D(32, (3, 3), strides=(2,2), activation = 'relu', padding = 'same')(resblock1_merge)
-                skip_resblock2_dropout = Dropout(dropoutrate)(skip_resblock2_conv)
-                resblock2_leaky1 = LeakyReLU()(resblock1_merge)
-                resblock2_dropout1 = Dropout(dropoutrate)(resblock2_leaky1)
-                resblock2_maxpool1 = MaxPooling2D((2, 2), padding='same')(resblock2_dropout1)
-                resblock2_leaky2 = LeakyReLU()(resblock2_maxpool1)
-                resblock2_dropout2 = Dropout(dropoutrate)(resblock2_leaky2)
-                resblock2_conv = Conv2D(32, (3 ,3), activation = 'relu', padding = 'same') (resblock2_dropout2)
-                resblock2_dropout3 = Dropout(dropoutrate)(resblock2_conv)
-                resblock2_merge = Add()([resblock2_dropout3, skip_resblock2_dropout])
+dataset_evaluate = utils.get_dataset(
+    constants.file_pattern_evaluate,
+    data_size=64,
+    sample_size=side_length,
+    batch_size = 100,
+    num_in_channels=12,
+    compression_type=None,
+    clip_and_normalize = True,
+    clip_and_rescale=False,
+    random_crop=False,
+    center_crop=False,
+    transformer_shape=True
+)                                
 
-                enc_upsample1 = UpSampling2D((2, 2))(resblock2_merge)
+def compute_metrics(eval_pred):
+    logits, labels = eval_pred
+    # logits are of shape (batch_size, num_labels, height, width), so
+    # we first transpose them to (batch_size, height, width, num_labels)
+    logits = tf.transpose(logits, perm=[0, 2, 3, 1])
+    # scale the logits to the size of the label
+    logits_resized = tf.image.resize(
+        logits,
+        size=tf.shape(labels)[1:],
+        method="bilinear",
+    )
+    probabilities = tf.nn.softmax(logits_resized, axis=-1)
+    
+    # compute the prediction labels and compute the metric
+    pred_labels = probabilities[:,:,:,1]
+    
+    pred_labels = tf.reshape(pred_labels, shape=(-1,))
+    
+    #pred_labels = tf.argmax(probabilities, axis=-1)
+    metrics = metric.compute(
+        prediction_scores= pred_labels,
+        references=labels,
+    )
+    # add per category metrics as individual key-value pairs
+    per_category_auc = metrics.pop("pr_auc").tolist()
 
-                #ResBlock(Conv2D)
-                skip_resblock3_conv = Conv2D(16, (3, 3), activation = 'relu', padding = 'same')(enc_upsample1)
-                skip_resblock3_dropout = Dropout(dropoutrate)(skip_resblock3_conv)
-                resblock3_leaky1 = LeakyReLU()(enc_upsample1)
-                resblock3_dropout1 = Dropout(dropoutrate)(resblock3_leaky1)
-                resblock3_conv2D = Conv2D(16, (3, 3), activation = 'relu', padding = 'same')(resblock3_dropout1)
-                resblock3_leaky2 = LeakyReLU()(resblock3_conv2D)
-                resblock3_dropout2 = Dropout(dropoutrate)(resblock3_leaky2)
-                resblock3_conv = Conv2D(16, (3 ,3), activation = 'relu', padding = 'same') (resblock3_dropout2)
-                resblock3_dropout3 = Dropout(dropoutrate)(resblock3_conv)
-                resblock3_merge = Add()([resblock3_dropout3, skip_resblock3_dropout])
+    metrics.update({f"auc_pr": v for i, v in enumerate(per_category_auc)})
+    return {"val_" + k: v for k, v in metrics.items()}
 
-                enc_upsample2 = UpSampling2D((2,2))(resblock3_merge)
 
-                #ResBlock(Conv2D)
-                skip_resblock4_conv = Conv2D(16, (3, 3), activation = 'relu', padding = 'same')(enc_upsample2)
-                skip_resblock4_dropout = Dropout(dropoutrate)(skip_resblock4_conv)
-                resblock4_leaky1 = LeakyReLU()(enc_upsample2)
-                resblock4_dropout1 = Dropout(dropoutrate)(resblock4_leaky1)
-                resblock4_conv2D = Conv2D(16, (3, 3), activation = 'relu', padding='same')(resblock4_dropout1)
-                resblock4_leaky2 = LeakyReLU()(resblock4_conv2D)
-                resblock4_dropout2 = Dropout(dropoutrate)(resblock4_leaky2)
-                resblock4_conv = Conv2D(16, (3 ,3), activation = 'relu', padding = 'same') (resblock4_dropout2)
-                resblock4_dropout3 = Dropout(dropoutrate)(resblock4_conv)
-                resblock4_merge = Add()([resblock4_dropout3, skip_resblock4_dropout])
+metric_callback = KerasMetricCallback(
+    metric_fn=compute_metrics,
+    eval_dataset=dataset_evaluate,
+    batch_size=128,
+    label_cols=["labels"],
+)
 
-                enc_output = Conv2D(1, (3, 3), activation = 'sigmoid', padding='same')(resblock4_merge) 
-                
-                opt = keras.optimizers.Adam(learning_rate = learningrate)
-                
-                autoencoder = Model(input_img, enc_output)
-                autoencoder.compile(optimizer=opt,loss='BinaryCrossentropy', metrics=[keras.metrics.MeanIoU(num_classes=2)])
+
+#print(model.config)
+opt = keras.optimizers.Adam(learning_rate = 0.001)
+
+model.compile(optimizer=opt, loss='BinaryCrossentropy', metrics=[keras.metrics.BinaryIoU(target_class_ids=[0, 1], threshold=0.5)])
                 
 
-                
-                history = autoencoder.fit(dataset_evaluate, epochs=2, validation_data=dataset_test, shuffle=True, callbacks=[WandbMetricsLogger(log_freq="epoch")])
-                
-                
-                results = autoencoder.evaluate(dataset_evaluate)
-                experiment.finish()
-                
+model.fit(dataset_evaluate, epochs=2, validation_data=dataset_test)
+
+

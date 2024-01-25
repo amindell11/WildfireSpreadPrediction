@@ -134,14 +134,7 @@ for epoch in parameters.epochs_try:
                 num_labels=2,
                 ignore_index=-1
             )
-            # add per category metrics as individual key-value pairs
-            per_category_accuracy = metrics.pop("per_category_accuracy").tolist()
-            per_category_iou = metrics.pop("per_category_iou").tolist()
-
-            metrics.update(
-                {f"accuracy": v for i, v in enumerate(per_category_accuracy)}
-            )
-            metrics.update({f"iou": v for i, v in enumerate(per_category_iou)})
+            
             return {"val_" + k: v for k, v in metrics.items()}
 
 
