@@ -49,7 +49,7 @@ for epoch in parameters.epochs_try:
                 
 
                 dataset = utils.get_dataset(
-                    constants.file_pattern,
+                    constants.cloud_file_pattern,
                     data_size=64,
                     sample_size=side_length,
                     batch_size=config.batch_size,
@@ -63,7 +63,7 @@ for epoch in parameters.epochs_try:
 
                 
                 dataset_test = utils.get_dataset(
-                    constants.file_pattern_test,
+                    constants.cloud_file_pattern_test,
                     data_size=64,
                     sample_size=side_length,
                     batch_size = config.batch_size,
@@ -77,7 +77,7 @@ for epoch in parameters.epochs_try:
                 )
 
                 dataset_evaluate = utils.get_dataset(
-                    constants.file_pattern_evaluate,
+                    constants.cloud_file_pattern_evaluate,
                     data_size=64,
                     sample_size=side_length,
                     batch_size = 100,
