@@ -55,7 +55,7 @@ for epoch in parameters.epochs_try:
                         print(f"Starting Training: \
                                 Learning Rate: {lr} \
                                 Epochs: {num_epochs} \
-                                Batch Size: 128 \ 
+                                Batch Size: 128 \
                                 Hidden Size: {config.hidden_size} \
                                 Depth: {config.depth} \
                                 Decoder Hidden Size: {config.decoder_hidden_size} \
