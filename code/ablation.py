@@ -49,7 +49,7 @@ config = wandb.config
 metric = evaluate.load("mean_iou")
 
 configg = SegformerConfig(
-    num_channels = 11
+    num_channels = 11,
     image_size = 64,
     )
 model = TFSegformerForSemanticSegmentation(
