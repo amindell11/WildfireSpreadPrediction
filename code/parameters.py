@@ -1,4 +1,4 @@
-epochs_try = [100] #callback
+epochs_try = [25, 100] #callback
 learning_rate_try = [0.001, 0.0005, 0.00001]
 hidden_sizes_try = [[32, 64, 160, 256]]
 depths_try = [[2, 2, 2, 2]]
