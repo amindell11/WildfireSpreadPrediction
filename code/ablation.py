@@ -36,7 +36,7 @@ for epoch in parameters.epochs_try:
         "optimizer": "adam",
         "epochs": num_epochs,
         "batch_size": 128,
-        "taken_out": "pdsi"
+        "taken_out": "NDVI"
         }
     )
     print(f"Starting Training: \
