@@ -35,7 +35,8 @@ for epoch in parameters.epochs_try:
         "dataset": "NDWS",
         "optimizer": "adam",
         "epochs": num_epochs,
-        "batch_size": 128
+        "batch_size": 128,
+        "taken_out": "vs"
         }
     )
     print(f"Starting Training: \
