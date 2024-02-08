@@ -10,8 +10,8 @@ cloud_file_pattern_evaluate = '/home/ubuntu/next_day_wildfire_spread_eval*'
 
 # INPUT_FEATURES = ['elevation', 'th', 'vs',  'tmmn', 'tmmx', 'sph',
 #                                 'pr', 'pdsi', 'NDVI', 'population', 'erc', 'PrevFireMask']
-INPUT_FEATURES = ['th', 'vs',  'tmmn', 'tmmx', 'sph',
-                                'pr', 'pdsi', 'NDVI', 'population', 'erc', 'PrevFireMask']
+INPUT_FEATURES = ['elevation', 'vs',  'tmmn', 'tmmx', 'sph',
+                                  'pr', 'pdsi', 'NDVI', 'population', 'erc', 'PrevFireMask']
 
 OUTPUT_FEATURES = ['FireMask', ]
 
