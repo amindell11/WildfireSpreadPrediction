@@ -1,0 +1,26 @@
+git clone https://github.com/Galagalagalaga/WildfireResearch23.git
+
+wget --header="Host: storage.googleapis.com" --header="User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36" --header="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8" --header="Accept-Language: en-US,en;q=0.6" --header="Referer: https://www.kaggle.com/" "https://storage.googleapis.com/kaggle-data-sets/1726926/2824184/bundle/archive.zip?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20240208%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20240208T023249Z&X-Goog-Expires=259200&X-Goog-SignedHeaders=host&X-Goog-Signature=80eeb1daeaf5c82ff3280525cff53050fa3a96a0ea1d8e9b66fe52f03ad99806059b230acb7da8c73d3fe958aa4ced40bb59893cc7e0ce9b237f43710d77a3e908a7a5b37c2761c677044fabcd0805b884f99811112c9acb830e756e17e772925dfebc3e7b851705d0672e01ace3039852272fb1cf31e289187ad51ce90d56144df3a09acf15f3d04bd35f225b9243948864628853b9bcbc0deefcd4aab036413628c9eaaf235c3c82c0e1afa898b042d127454b8e2a8b2a584ca101a86980c1c805ce14cffd043956b8552365f46b82d81a2b637b46675fe456eedf46072b3f63e6e2b61b5ef1b380975c9fb68c1f51604a2e6f2b5094bb843e56c41d35282d" -c -O 'archive.zip'
+
+unzip archive.zip
+
+mkdir -p ~/miniconda3
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm -rf ~/miniconda3/miniconda.sh
+
+~/miniconda3/bin/conda init bash
+~/miniconda3/bin/conda init zsh
+
+conda create -n wildenv python=3.11.4
+
+conda activate wildenv
+pip install tensorflow
+pip install wandb
+pip install transformers
+pip install evaluate
+pip install matplotlib
+pip install scikit-learn
+
+
+1f8a5548acad0f0631891c56b5af05962e9bd898
