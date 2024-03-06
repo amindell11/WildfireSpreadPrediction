@@ -38,7 +38,7 @@ for epoch in parameters.epochs_try:
                         numencoderblocks = numenc
                         
                         experiment = wandb.init(
-                        project="WildfirePropagation23-24",
+                        project="WildfirePropagation23-24v2",
                         config={
                             "learning_rate": learningrate,
                             "architecture": "SegFormer",
@@ -66,7 +66,7 @@ for epoch in parameters.epochs_try:
                         config = wandb.config
 
                         metric = evaluate.load("mean_iou")
-
+                        m = keras.metrics.BinaryIoU(target_class_ids=[0, 1], threshold=0.5)
                         configg = SegformerConfig(
                             num_channels = 12,
                             image_size = 64,
@@ -144,15 +144,14 @@ for epoch in parameters.epochs_try:
                             # compute the prediction labels and compute the metric
                             pred_labels = tf.argmax(logits_resized, axis=-1)
                             
-                            
-                            metrics = metric.compute(
-                                predictions=pred_labels,
-                                references=labels,
-                                num_labels=2,
-                                ignore_index=-1
-                            )
-                            
-                            return {"val_" + k: v for k, v in metrics.items()}
+                            m.update_state(labels, pred_labels)
+                            # metrics = metric.compute(
+                            #     predictions=pred_labels,
+                            #     references=labels,
+                            #     num_labels=2,
+                            #     ignore_index=-1
+                            #)
+                            return {"val_iou": m.result().numpy()}
 
 
 

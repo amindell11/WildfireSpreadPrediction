@@ -22,5 +22,7 @@ pip install evaluate
 pip install matplotlib
 pip install scikit-learn
 
+cd WildfireResearch23/code
+python ablation.py
 
 1f8a5548acad0f0631891c56b5af05962e9bd898
