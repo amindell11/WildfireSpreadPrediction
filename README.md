@@ -120,6 +120,8 @@ WildfireResearch23/
 │   ├── parameters.py                           # Hyperparameter grid search settings
 │   ├── utils.py                                # Data preprocessing, loading, visualization
 │   ├── ...                                     # Remaining contents condensed
+
+Below contents are not relevant for main part of project, and are early versions or experiments. 
 ├── lambdakey/                                  # Directory storing LambdaLabs Key
 │   ├── testingkey.pem                          # My key (probably doesn't work anymore)
 ├── notebooks/                                  # Testing scripts developed in early stages of project
