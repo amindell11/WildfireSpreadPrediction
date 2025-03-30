@@ -18,7 +18,8 @@ All experiments were logged and visualized using [Weights & Biases (WandB)](http
 
 ### 🌀 1. Convolutional Autoencoder (CAE)
 - Designed using skip connections and ResBlocks.
-- Architecture inspired by [Zhuang et al. (2021)](https://arxiv.org/abs/2112.02447) (*"Forecasting the Spread of Wildfires Using Deep Learning"*) — their model diagram was used as a reference to reconstruct the CAE from scratch.
+- Architecture inspired by [Huot et al. (2021)](https://arxiv.org/abs/2112.02447) (*'Next Day Wildfire Spread: A Machine Learning Data Set to Predict Wildfire Spreading from Remote-Sensing Data
+'*) — their model diagram was used as a reference to reconstruct the CAE from scratch.
 - Trained using different combinations of:
   - Learning rate
   - Batch size
@@ -48,8 +49,8 @@ See: [wandb.ai/WildfireAblation](https://wandb.ai/arthur-v-qin/WildfireAblation?
 
 The model design and data handling pipeline were based heavily on:
 
-> **Zhuang, X., Karra, S., Beery, S., Krause, J., & Lobell, D. (2021).**  
-> *Forecasting the Spread of Wildfires Using Deep Learning*.  
+> **Huot, F., Hu, L.R., Goyal, Nita., Sankar, T., Ihme, M., & Chen, Y. (2021).**  
+> *Next Day Wildfire Spread: A Machine Learning Data Set to Predict Wildfire Spreading from Remote-Sensing Data*.  
 > [arXiv:2112.02447](https://arxiv.org/abs/2112.02447)
 
 While many utility functions and the data pipeline structure (including TFRecord parsing, input/output handling, and clipping) were adapted from this work, all model implementations — especially the full transformer training pipeline and custom CAE code — were written independently.
@@ -156,6 +157,6 @@ WildfireResearch23/
 
 ## 📜 License / Citation
 
-You may use or build upon this code, but please cite the original paper [Zhuang et al. (2021)](https://arxiv.org/abs/2112.02447) if you make use of the dataset parsing utilities or data normalization strategies.
+You may use or build upon this code, but please cite the original paper [Huot et al. (2021)](https://arxiv.org/abs/2112.02447) if you make use of the dataset parsing utilities or data normalization strategies.
 
 ---
