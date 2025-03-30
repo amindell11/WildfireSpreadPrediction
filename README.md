@@ -59,7 +59,7 @@ While many utility functions and the data pipeline structure (including TFRecord
 
 ## 🧰 Setup Instructions
 
-The following commands reproduce the cloud training environment used on Lambda Labs (Ubuntu + NVIDIA A100). You may need a Lambda Key to rent the GPUs. You will also need to change the file directories in the constants.py file.
+The following commands reproduce the cloud training environment used on Lambda Labs (Ubuntu + NVIDIA A100). You may need a Lambda Key to rent the GPUs. You will also need to change the file directories in the constants.py file. If you would like to edit model configs, edit the parameters.py file.
 
 ### 📦 Clone the Repository
 ```bash
