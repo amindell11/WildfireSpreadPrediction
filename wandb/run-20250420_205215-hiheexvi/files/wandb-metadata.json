@@ -1,0 +1,30 @@
+{
+  "os": "Linux-6.1.123+-x86_64-with-glibc2.35",
+  "python": "CPython 3.11.12",
+  "startedAt": "2025-04-20T20:52:15.303375Z",
+  "program": "Untitled1.ipynb",
+  "git": {
+    "remote": "https://github.com/amindell11/WildfireSpreadPrediction",
+    "commit": "749caf0b3809c42562bdb49d7cfce4f94a836532"
+  },
+  "email": "amindell11@gmail.com",
+  "root": "/content/WildfireSpreadPrediction",
+  "host": "f66956c53eb8",
+  "executable": "/usr/bin/python3",
+  "colab": "https://colab.research.google.com/notebook#fileId=1pqpxeEclhWXc7vmufJafzH4rldIE-svi",
+  "cpu_count": 1,
+  "cpu_count_logical": 2,
+  "disk": {
+    "/": {
+      "total": "242486079488",
+      "used": "39750414336"
+    }
+  },
+  "memory": {
+    "total": "13608370176"
+  },
+  "cpu": {
+    "count": 1,
+    "countLogical": 2
+  }
+}
