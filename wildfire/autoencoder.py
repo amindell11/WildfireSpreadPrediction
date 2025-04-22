@@ -73,11 +73,11 @@ def build_autoencoder(input_shape, dropout_rate):
 
     return Model(input_img, output)
 
-def load_datasets(config, side_length=64):
+def get_dataset_args(batch_size=100, side_length=64):
     kwargs = {
         "data_size": 64,
         "sample_size": side_length,
-        "batch_size": config.batch_size,
+        "batch_size": batch_size,
         "num_in_channels": 12,
         "compression_type": None,
         "clip_and_normalize": True,
@@ -86,11 +86,7 @@ def load_datasets(config, side_length=64):
         "center_crop": False,
         "transformer_shape": False
     }
-
-    dataset = utils.get_dataset(constants.cloud_file_pattern, **kwargs)
-    dataset_test = utils.get_dataset(constants.cloud_file_pattern_test, **kwargs)
-    dataset_eval = utils.get_dataset(constants.cloud_file_pattern_evaluate, batch_size=100, **kwargs)
-    return dataset, dataset_test, dataset_eval
+    return kwargs
 
 def train_and_evaluate_model(model, dataset, dataset_test, dataset_eval, config):
     model.compile(
@@ -109,6 +105,7 @@ def train_and_evaluate_model(model, dataset, dataset_test, dataset_eval, config)
     results = model.evaluate(dataset_eval)
     return results
 
+#NONFUNCTIONAL
 def hyper_param_sweep():
     for epoch in parameters.epochs_try:
         for lr in parameters.learning_rate_try:
@@ -128,7 +125,7 @@ def hyper_param_sweep():
                     )
                     config = wandb.config
                     print(f"Training - LR: {lr}, Epochs: {epoch}, Batch Size: {batchsize}, Dropout: {dr}")
-
+                    
                     dataset, dataset_test, dataset_eval = load_datasets(config)
                     model = build_autoencoder(input_shape=(64, 64, 12), dropout_rate=config.dropout_rate)
                     train_and_evaluate_model(model, dataset, dataset_test, dataset_eval, config)
