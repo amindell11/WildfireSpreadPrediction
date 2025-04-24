@@ -1,9 +1,8 @@
-from tensorflow import keras
-from keras.layers import Conv2D, Input, Dropout, Add, LeakyReLU, MaxPooling2D, UpSampling2D
-from keras.models import Model
+import tensorflow as tf
+from tensorflow.keras.layers import Conv2D, Input, Dropout, Add, LeakyReLU, MaxPooling2D, UpSampling2D
+from tensorflow.keras.models import Model
 
 import wandb
-from wandb.keras import WandbMetricsLogger
 
 from . import constants
 from . import utils
@@ -82,52 +81,26 @@ def get_dataset_args(batch_size=100, side_length=64):
         "compression_type": None,
         "clip_and_normalize": True,
         "clip_and_rescale": False,
-        "random_crop": False,
+        "random_crop": True,
         "center_crop": False,
         "transformer_shape": False
     }
     return kwargs
 
 def train_and_evaluate_model(model, dataset, dataset_test, dataset_eval, config):
+    print('test')
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=config.learning_rate),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=config['learning_rate']),
         loss='BinaryCrossentropy',
-        metrics=[keras.metrics.BinaryIoU(target_class_ids=[0, 1], threshold=0.5)]
+        metrics=[tf.keras.metrics.BinaryIoU(target_class_ids=[0, 1], threshold=0.5)]
     )
 
     model.fit(
         dataset,
-        epochs=config.epochs,
+        epochs=config['epochs'],
         validation_data=dataset_test,
-        callbacks=[WandbMetricsLogger(log_freq="epoch")]
+        callbacks=[]
     )
 
     results = model.evaluate(dataset_eval)
     return results
-
-#NONFUNCTIONAL
-def hyper_param_sweep():
-    for epoch in parameters.epochs_try:
-        for lr in parameters.learning_rate_try:
-            for dr in parameters.dropout_rate_try:
-                for batchsize in parameters.batchsize_try:
-                    experiment = wandb.init(
-                        project="WildfirePropagation23-24",
-                        config={
-                            "learning_rate": lr,
-                            "architecture": "Convolutional Autoencoder",
-                            "dataset": "NDWS",
-                            "optimizer": "adam",
-                            "epochs": epoch,
-                            "batch_size": batchsize,
-                            "dropout_rate": dr
-                        }
-                    )
-                    config = wandb.config
-                    print(f"Training - LR: {lr}, Epochs: {epoch}, Batch Size: {batchsize}, Dropout: {dr}")
-                    
-                    dataset, dataset_test, dataset_eval = load_datasets(config)
-                    model = build_autoencoder(input_shape=(64, 64, 12), dropout_rate=config.dropout_rate)
-                    train_and_evaluate_model(model, dataset, dataset_test, dataset_eval, config)
-
-                    experiment.finish()

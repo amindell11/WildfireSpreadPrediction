@@ -147,7 +147,7 @@ typing_extensions==4.8.0
 tzdata==2023.3
 urllib3==1.26.16
 uvicorn==0.24.0.post1
-wandb==0.15.8
+wandb==0.19.9
 wcwidth==0.2.6
 websockets==11.0.3
 Werkzeug==2.3.7
